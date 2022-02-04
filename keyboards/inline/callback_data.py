@@ -4,4 +4,4 @@ cb_menu = CallbackData('menu', 'submenu')
 
 cb_schedule = CallbackData('menu', 'submenu', 'day_name')
 
-cd_attestation = CallbackData('menu', 'submenu', 'semester')
+cb_attestation = CallbackData('menu', 'submenu', 'semester')

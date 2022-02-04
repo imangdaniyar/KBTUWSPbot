@@ -1,0 +1,8 @@
+URL = 'https://wsp.kbtu.kz/'
+ATTESTATION_URL = 'https://wsp.kbtu.kz/AttestationView'
+SCHEDULE_URL = 'https://wsp.kbtu.kz/StudentSchedule'
+ATTENDANCE_URL = 'https://wsp.kbtu.kz/RegistrationOnline'
+NEWS_URL = 'https://wsp.kbtu.kz/News'
+HOME_PATH = '/html/body/div[1]/div/div[2]/div/div[1]/div/div/div[1]/div'
+LOGIN_PAGE_PATH = '/html/body/div[1]/div/div[2]/div/div[2]/div/div[1]/div/div/div'
+LOGIN_BUTTON_PATH = '/html/body/div[1]/div/div[2]/div/div[2]/div/div/div/div/div/div/div[1]/div/div[2]/div/table/tbody/tr[4]/td[3]/div'

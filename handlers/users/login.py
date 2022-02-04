@@ -3,49 +3,10 @@ import logging
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher.filters import Command
-
-from keyboards.inline.callback_data import cb_menu, cb_schedule
+from utils.wsp.user import WSPUser
 from keyboards.inline.menu import *
 from loader import dp
 from states.login import Login
-
-schedule = {}
-
-
-@dp.callback_query_handler(cb_menu.filter(submenu='schedule'))
-async def schedule(call: CallbackQuery, callback_data: dict):
-    await call.answer(cache_time=60)
-    logging.info(f'call = {callback_data}')
-    await call.message.answer('Schedule:', reply_markup=schedule_menu)
-
-
-@dp.callback_query_handler(cb_schedule.filter(submenu='schedule'))
-async def schedule(call: CallbackQuery, callback_data: dict):
-    await call.answer(cache_time=60)
-    logging.info(f'call = {callback_data}')
-    day = callback_data.get('day_name')
-    await call.message.answer(f'<b>{day}</b> :')
-
-
-@dp.callback_query_handler(cb_menu.filter(submenu='attestation'))
-async def attestation(call: CallbackQuery, callback_data: dict):
-    await call.answer(cache_time=60)
-    logging.info(f'call = {callback_data}')
-    await call.message.answer('Attestation:')
-
-
-@dp.callback_query_handler(cb_menu.filter(submenu='news'))
-async def news(call: CallbackQuery, callback_data: dict):
-    await call.answer(cache_time=60)
-    logging.info(f'call = {callback_data}')
-    await call.message.answer('News:')
-
-
-@dp.callback_query_handler(cb_menu.filter(submenu='attendance'))
-async def attendance(call: CallbackQuery, callback_data: dict):
-    await call.answer(cache_time=60)
-    logging.info(f'call = {callback_data}')
-    await call.message.answer('Attendance:')
 
 
 @dp.callback_query_handler(text='login')
@@ -57,10 +18,23 @@ async def login(call: CallbackQuery):
     await call.message.answer('Login:')
 
 
+@dp.message_handler(Command('menu'), state=Login.logged)
+async def login(message: Message, state: FSMContext):
+    await message.answer('<b>Menu</b>', reply_markup=wsp_menu)
+
+
 @dp.message_handler(Command('login'))
 async def fetch_wsp_info(message: Message):
     await Login.login.set()
     await message.reply('Login:')
+
+
+@dp.message_handler(Command('logout'), state=Login.logged)
+async def logout(message: Message, state: FSMContext):
+    if await state.get_state() is None:
+        return
+    await state.finish()
+    await message.reply('Successfully logged out')
 
 
 @dp.message_handler(Command('cancel'), state='*')
@@ -83,12 +57,18 @@ async def fetch_password(message: Message, state: FSMContext):
     async with state.proxy() as data:
         data['password'] = message.text
     async with state.proxy() as data:
-        await message.answer(str({
-            'login': data['login'],
-            'password': data['password'],
-            'telegram_id': message.from_user.id,
-        }), reply_markup=wsp_menu)
-    await state.finish()
+        await message.answer('Wait...')
+        wsp_user = WSPUser(login=data['login'], password=data['password'])
+        wsp_user.login()
+        news = wsp_user.get_news()
+        schedule = wsp_user.get_schedule()
+        attestation = wsp_user.get_attestation_screenshot()
+        data['telegram_id'] = message.from_user.id
+        data['schedule'] = schedule
+        data['attestation'] = attestation
+        data['news'] = news
+        await message.answer('<b>Menu</b>', reply_markup=wsp_menu)
+        await Login.next()
 
 # @dp.message_handler(commands=['get_attestation'], state=None)
 # async def get_attestation(message: types.Message, state: FSMContext):

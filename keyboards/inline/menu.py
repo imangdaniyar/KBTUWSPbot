@@ -73,4 +73,3 @@ schedule_menu = InlineKeyboardMarkup(
     ]
 )
 
-attestation_menu = InlineKeyboardMarkup()

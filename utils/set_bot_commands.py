@@ -6,5 +6,10 @@ async def set_default_commands(dp):
         [
             types.BotCommand("start", "Запустить бота"),
             types.BotCommand("help", "Вывести справку"),
+            types.BotCommand("login", "Test Login WSP"),
+            types.BotCommand("cancel", "Cancel authorization"),
+            types.BotCommand("logout", "[Logged users] Logout"),
+            types.BotCommand("menu", "[Logged users] Get WSP menu}"),
+
         ]
     )
